@@ -17,8 +17,7 @@
 		<link rel="shortcut icon" href="{{ asset('assets/media/logos/favicon.ico') }}" />
 		<!--begin::Fonts(mandatory for all pages)-->
 		<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Inter:300,400,500,600,700" />
-		<!--end::Fonts-->
-		<!--begin::Global Stylesheets Bundle(mandatory for all pages)-->
+		
 		<link href="{{ asset('assets/plugins/global/plugins.bundle.css') }}" rel="stylesheet" type="text/css" />
 		<link href="{{ asset('assets/css/style.bundle.css') }}" rel="stylesheet" type="text/css" />
 		<!--end::Global Stylesheets Bundle-->
@@ -26,7 +25,18 @@
 	</head>
 	<!--end::Head-->
 	<!--begin::Body-->
-	<body id="kt_body" class="auth-bg bgi-size-cover bgi-attachment-fixed bgi-position-center bgi-no-repeat">
+	<body 
+		id="kt_body" 
+		class="auth-bg bgi-size-cover bgi-attachment-fixed bgi-position-center bgi-no-repeat"
+		@if (session('success')) notification_success="true"
+        notification_message="{{ session('success') }}" @endif
+        @if (session('warning')) notification_warning="true"
+        notification_message="{{ session('warning') }}" @endif
+        @if (session('info')) notification_info="true"
+        notification_message="{{ session('info') }}" @endif
+        @if (count($errors) > 0) notification_error="true"
+        notification_data="{{ json_encode($errors->all()) }}" @endif
+	>
 		<!--begin::Theme mode setup on page load-->
 		<script>
             var defaultThemeMode = "light"; 
@@ -96,19 +106,10 @@
 								<!--begin::Login options-->
 								<div class="row g-3 mb-9">
 									<!--begin::Col-->
-									<div class="col-md-6">
+									<div class="col-sm">
 										<!--begin::Google link=-->
 										<a href="#" class="btn btn-flex btn-outline btn-text-gray-700 btn-active-color-primary bg-state-light flex-center text-nowrap w-100">
 										<img alt="Logo" src="assets/media/svg/brand-logos/google-icon.svg" class="h-15px me-3" />Sign in with Google</a>
-										<!--end::Google link=-->
-									</div>
-									<!--end::Col-->
-									<!--begin::Col-->
-									<div class="col-md-6">
-										<!--begin::Google link=-->
-										<a href="#" class="btn btn-flex btn-outline btn-text-gray-700 btn-active-color-primary bg-state-light flex-center text-nowrap w-100">
-										<img alt="Logo" src="assets/media/svg/brand-logos/apple-black.svg" class="theme-light-show h-15px me-3" />
-										<img alt="Logo" src="assets/media/svg/brand-logos/apple-black-dark.svg" class="theme-dark-show h-15px me-3" />Sign in with Apple</a>
 										<!--end::Google link=-->
 									</div>
 									<!--end::Col-->
@@ -134,7 +135,15 @@
 								<!--end::Input group=-->
 								<!--begin::Wrapper-->
 								<div class="d-flex flex-stack flex-wrap gap-3 fs-base fw-semibold mb-8">
-									<div></div>
+									<div class="block mt-4">
+                                        <label class="form-check form-check-inline">
+                                            <input class="form-check-input" type="checkbox" name="remember"
+                                                id="remember_me">
+                                            <span
+                                                class="text-gray-700 form-check-label fw-semibold fs-base ms-1">{{ __('Remember me') }}</span>
+                                        </label>
+                                        <div class="fv-plugins-message-container invalid-feedback"></div>
+                                    </div>
 									<!--begin::Link-->
 									<a href="authentication/layouts/creative/reset-password.html" class="link-primary">Forgot Password ?</a>
 									<!--end::Link-->
@@ -247,12 +256,7 @@
 		<!--end::Root-->
 		<!--end::Main-->
 		<!--begin::Javascript-->
-		<script>var hostUrl = "assets/";</script>
-		<!--begin::Global Javascript Bundle(mandatory for all pages)-->
-		<script src="{{ asset('assets/plugins/global/plugins.bundle.js') }}"></script>
-		<script src="{{ asset('assets/js/scripts.bundle.js') }}"></script>
-		<!--end::Global Javascript Bundle-->
-		<!--begin::Custom Javascript(used for this page only)-->
+		@include('metronic/javascript')
 		<script src="{{ asset('assets/js/custom/authentication/sign-in/general.js') }}"></script>
 		<!--end::Custom Javascript-->
 		<!--end::Javascript-->

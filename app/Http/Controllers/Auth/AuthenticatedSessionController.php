@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Auth\LoginRequest;
+use App\Models\UserRoles;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -24,11 +25,40 @@ class AuthenticatedSessionController extends Controller
      */
     public function store(LoginRequest $request): RedirectResponse
     {
+        $request['status'] = 1;
         $request->authenticate();
 
         $request->session()->regenerate();
+        $this->generateToken();
+        return redirect()->intended(route('dashboard', absolute: false))->with('success', 'Login Success ...');
+    }
 
-        return redirect()->intended(route('dashboard', absolute: false));
+    public function generateToken()
+    {
+        $user = request()->user();
+        $tokenResult = $user->createToken('Personal Access Token');
+        
+        $userRoles = UserRoles::with(['role_id', 'rolePrevileges'])->where('user_id', $user->id)->get()->toArray();
+        $rolesList = [];
+        $permissions = [];
+        foreach ($userRoles as $key => $items) {
+            $rolesList[] = $items['role_id']['name'];
+            for ($i = 0; $i < count($items['role_previleges']); $i++) {
+                $permissions[] = $items['role_previleges'][$i]['namespace'];
+            }
+        }
+
+        $permissions = array_unique($permissions);
+
+        if (count($permissions) <= 0) $permissions[] = 'dashboard';
+
+        $setPermisson = [
+            'bearer_token' => $tokenResult->plainTextToken,
+            'permissions' => $permissions,
+            'role_list' => $rolesList
+        ];
+
+        session($setPermisson);
     }
 
     /**
@@ -42,6 +72,6 @@ class AuthenticatedSessionController extends Controller
 
         $request->session()->regenerateToken();
 
-        return redirect('/');
+        return redirect('/login')->with('warning', 'You are now not authenticated, please login to get access ...');
     }
 }
