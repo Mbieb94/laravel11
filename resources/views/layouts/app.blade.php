@@ -4,8 +4,10 @@
 	<head>
 		<title>{{ config('app.name', 'Laravel') }}</title>
 		<meta charset="utf-8" />
-		<meta name="token" content="{{ session('bearer_token') }}" />
+		<meta name="bearer-token" content="{{ session('bearer_token') }}" />
         <meta name="csrf-token" content="{{ csrf_token() }}">
+		<meta name="base-url" content="{{ url('') }}">
+		<meta name="current-segment" content="{{ request()->segment(1) }}">
 		<meta name="description" content="" />
 		<meta name="keywords" content="" />
 		<meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -14,7 +16,7 @@
 		<meta property="og:title" content="{{ config('app.name', 'Laravel') }}" />
 		<meta property="og:url" content="{{ url('') }}" />
 		<meta property="og:site_name" content="Laravel 11" />
-		
+		@yield('meta')
 		@include('metronic/css')
         @yield('custom-css')
 	</head>

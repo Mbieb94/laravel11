@@ -38,8 +38,48 @@ class AppController extends Controller
             $this->forms = $this->model->getForms();
             $this->reference = $this->model->getReference();
         } catch (Exception $e) {
-            abort(500);
+            throw new Exception($e->getMessage());
+            // dd($e->getMessage());
+            // abort(500);
         }
+    }
+
+    public function list()
+    {
+        $model = $this->model;
+        if (!$model) abort(404);
+        try {
+            $this->view = $this->checkView($this->view, 'list');
+            return $this->view->with(
+                [
+                    'forms' => $this->forms,
+                    'segmentName' => $this->segmentName,
+                    'model' => $model
+                ]
+            );
+        } catch (Exception $e) {
+            throw new Exception($e->getMessage());
+        }
+    }
+
+    public function create()
+    {
+        $this->view = $this->checkView($this->view, 'create');
+
+        return $this->view->with(
+            [
+                'forms' => $this->forms
+            ]
+        );
+    }
+
+    public function checkView($dir, $fileName)
+    {
+        $directory = $dir . '.' . $fileName;
+        $dirname = str_replace('.', '/', $directory);
+        $basePath = base_path('resources/views/') . $dirname . '.blade.php';
+        if (file_exists($basePath)) return view($directory);
+        return view('admin.shared.' . $fileName);
     }
 }
 
